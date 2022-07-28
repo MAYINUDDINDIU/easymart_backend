@@ -1,6 +1,6 @@
 const express = require('express')
 const cors = require('cors');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 const port = process.env.PORT || 5000;
 require('dotenv').config();
@@ -15,6 +15,35 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db("productCollection").collection("product");
+
+        // Create or Post new product
+        app.post('/product', async (req, res) => {
+            const newProduct = req.body;
+            const addNewProducts = await productsCollection.insertOne(newProduct);
+            res.send(addNewProducts);
+        });
+
+        // Read all product
+        app.get('/product', async (req, res) => {
+            const products = await productsCollection.find().toArray();
+            res.send(products);
+        });
+
+        // Read only single product
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const product = await productsCollection.findOne(query);
+            res.send(product);
+        });
+
+        // Delete single product from all product
+        app.delete('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const deleteProduct = await productsCollection.deleteOne(query);
+            res.send(deleteProduct);
+        });
     }
     finally {
 

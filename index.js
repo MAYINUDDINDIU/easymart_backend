@@ -29,6 +29,41 @@ async function run() {
             res.send(products);
         });
 
+        // Read all Men product
+        app.get('/MenProduct', async (req, res) => {
+            const pdct = req.body;
+            const query = { women: pdct.women, kids: pdct.kids }
+            if (query) {
+                const cursor = productsCollection.find(query);
+                const products = await cursor.toArray();
+                res.send(products);
+            }
+        });
+
+        // Read all Womens product
+        app.get('/WomenProduct', async (req, res) => {
+            const pdct = req.body;
+            const query = { men: pdct.men, kids: pdct.kids };
+            if (query) {
+
+                const cursor = productsCollection.find(query);
+                const products = await cursor.toArray();
+                res.send(products);
+            }
+        });
+
+        // Read all Kids product
+        app.get('/kidProduct', async (req, res) => {
+            const pdct = req.body;
+            const query = { men: pdct.men, women: pdct.women };
+            if (query) {
+
+                const cursor = productsCollection.find(query);
+                const products = await cursor.toArray();
+                res.send(products);
+            }
+        });
+
         // Read only single product
         app.get('/product/:id', async (req, res) => {
             const id = req.params.id;

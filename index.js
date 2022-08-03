@@ -15,6 +15,7 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db("productCollection").collection("product");
+        const userCollection = client.db("productCollection").collection("users");
 
         // Create or Post new product
         app.post('/product', async (req, res) => {
@@ -95,7 +96,19 @@ async function run() {
             };
             const result = await productsCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
-        })
+        });
+
+        app.put('user/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
     }
     finally {
 

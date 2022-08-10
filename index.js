@@ -115,6 +115,14 @@ async function run() {
             const cartData = await addToCartCollection.find().toArray();
             res.send(cartData);
         });
+
+        // delete cart data
+        app.delete('/addtocart/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const deleteCartData = await addToCartCollection.deleteOne(query);
+            res.send(deleteCartData);
+        });
     }
     finally {
 

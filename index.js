@@ -15,7 +15,7 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db("productCollection").collection("product");
-        const userCollection = client.db("productCollection").collection("users");
+        const addToCartCollection = client.db("productCollection").collection("addToCart");
 
         // Create or Post new product
         app.post('/product', async (req, res) => {
@@ -98,16 +98,16 @@ async function run() {
             res.send(result);
         });
 
-        app.put('user/:email', async (req, res) => {
-            const email = req.params.email;
-            const user = req.body;
-            const filter = { email: email };
-            const options = { upsert: true };
-            const updateDoc = {
-                $set: user,
-            };
-            const result = await userCollection.updateOne(filter, updateDoc, options);
-            res.send(result);
+        // Add To Cart
+        app.post('/addtocart', async (req, res) => {
+            const addToCart = req.body;
+            const query = { name: addToCart.name, referencef: addToCart.referencef }
+            const exists = await addToCartCollection.findOne(query);
+            if (exists) {
+                return res.send({ success: false, purchae: exists })
+            }
+            const add = await addToCartCollection.insertOne(addToCart);
+            return res.send({ success: true, add });
         });
     }
     finally {

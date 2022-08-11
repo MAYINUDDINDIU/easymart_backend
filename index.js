@@ -15,6 +15,7 @@ async function run() {
     try {
         await client.connect();
         const productsCollection = client.db("productCollection").collection("product");
+        const addToCartCollection = client.db("productCollection").collection("addToCart");
 
         // Create or Post new product
         app.post('/product', async (req, res) => {
@@ -95,7 +96,41 @@ async function run() {
             };
             const result = await productsCollection.updateOne(filter, updatedDoc, options);
             res.send(result);
-        })
+        });
+
+        // Add To Cart
+        app.post('/addtocart', async (req, res) => {
+            const addToCart = req.body;
+            const query = { name: addToCart.name }
+            const exists = await addToCartCollection.findOne(query);
+            if (exists) {
+                return res.send({ success: false, purchae: exists })
+            }
+            const add = await addToCartCollection.insertOne(addToCart);
+            return res.send({ success: true, add });
+        });
+
+        // Read all Cart Data
+        app.get('/addtocart', async (req, res) => {
+            const cartData = await addToCartCollection.find().toArray();
+            res.send(cartData);
+        });
+
+        // Read only single product
+        app.get('/addtocart/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: id }
+            const product = await addToCartCollection.findOne(query);
+            res.send(product);
+        });
+
+        // delete cart data
+        app.delete('/deleteCart/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: id }
+            const deleteCartData = await addToCartCollection.deleteOne(query);
+            res.send(deleteCartData);
+        });
     }
     finally {
 

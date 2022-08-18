@@ -116,7 +116,7 @@ async function run() {
             res.send(cartData);
         });
 
-        // Read only single product
+        // Read only single cart data
         app.get('/addtocart/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: id }
@@ -131,6 +131,41 @@ async function run() {
             const deleteCartData = await addToCartCollection.deleteOne(query);
             res.send(deleteCartData);
         });
+
+
+
+        // Update quantity with previous quantity
+        app.put('/products/:id', async (req, res) => {
+            const id = req.params.id;
+            const user = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: {
+                    quantity: user.increaseQuantity
+                }
+            }
+            // let updateDoc;
+            // if (user.increseQuantity) {
+            //     updateDoc = {
+            //         $set: {
+            //             quantity: user.increseQuantity,
+            //         },
+            //     }
+            // }
+            // else {
+            //     updateDoc = {
+            //         $set: {
+            //             quantity: user.reduceQuantity,
+            //         },
+            //     }
+            // }
+            const result = await productsCollection.updateOne(filter, updateDoc, options);
+            res.send(result);
+        });
+
+
+
     }
     finally {
 

@@ -99,6 +99,7 @@ async function run() {
           price: data.price,
           quantity: data.quantity,
           img: data.img,
+          offer: data.offer,
         },
       };
       const result = await productsCollection.updateOne(

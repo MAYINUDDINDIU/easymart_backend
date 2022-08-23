@@ -14,7 +14,7 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-
+console.log(uri);
 async function run() {
   try {
     await client.connect();
@@ -99,6 +99,7 @@ async function run() {
           price: data.price,
           quantity: data.quantity,
           img: data.img,
+          offer: data.offer,
         },
       };
       const result = await productsCollection.updateOne(
@@ -162,6 +163,23 @@ async function run() {
     app.get("/users", async (req, res) => {
       const users = await userCollection.find().toArray();
       res.send(users);
+    });
+    //Updating cart product amount
+    app.put("/increase/:id", async (req, res) => {
+      const productId = req.params.id;
+      const cart = req.body;
+      console.log(productId, cart);
+      const filter = { _id: ObjectId(productId) };
+      const option = { upsert: true };
+      const updatedDoc = {
+        $set: cart,
+      };
+      const result = await addToCartCollection.updateOne(
+        filter,
+        updatedDoc,
+        option
+      );
+      res.send(result);
     });
   } finally {
   }

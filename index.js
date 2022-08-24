@@ -1,4 +1,3 @@
-
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -26,7 +25,6 @@ async function run() {
       .db("productCollection")
       .collection("addToCart");
     const userCollection = client.db("productCollection").collection("user");
-
 
     // Create or Post new product
     app.post("/product", async (req, res) => {
@@ -181,6 +179,20 @@ async function run() {
         updatedDoc,
         option
       );
+      res.send(result);
+    });
+    //Updating user profiles
+    app.put("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const profile = req.body;
+      const filter = { email: email };
+      const option = { upsert: true };
+
+      const updatedDoc = {
+        $set: profile,
+      };
+      const result = await userCollection.updateOne(filter, updatedDoc, option);
+
       res.send(result);
     });
   } finally {

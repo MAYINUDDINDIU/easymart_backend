@@ -25,6 +25,9 @@ async function run() {
       .db("productCollection")
       .collection("addToCart");
     const userCollection = client.db("productCollection").collection("user");
+    const reviewCollection = client
+      .db("productCollection")
+      .collection("reviews");
 
     // Create or Post new product
     app.post("/product", async (req, res) => {
@@ -194,6 +197,26 @@ async function run() {
       const result = await userCollection.updateOne(filter, updatedDoc, option);
 
       res.send(result);
+    });
+    //Adding Review
+    app.post("/reviews", async (req, res) => {
+      const review = req.body;
+      const reviewData = {
+        name: review.name,
+        email: review.email,
+        image: review.image,
+        review: review.review,
+        productId: review.productId,
+        ratings: parseFloat(review.ratings),
+      };
+      console.log(reviewData);
+      const result = await reviewCollection.insertOne(reviewData);
+      res.send(result);
+    });
+    //Getting All Reviews
+    app.get("/reviews", async (req, res) => {
+      const allReviews = await reviewCollection.find().toArray();
+      res.send(allReviews);
     });
   } finally {
   }

@@ -29,6 +29,7 @@ async function run() {
     const reviewCollection = client
       .db("productCollection")
       .collection("reviews");
+    const orderCollection = client.db("productCollection").collection("orders");
 
     // Create or Post new product
     app.post("/product", async (req, res) => {
@@ -235,6 +236,30 @@ async function run() {
       res.send({
         clientSecret: paymentIntent.client_secret,
       });
+    });
+    //Removing cart items after payment
+    app.delete("/removeFromCart/:email", async (req, res) => {
+      const email = req.params.email;
+      const removeFromCart = await addToCartCollection.deleteMany({
+        email: email,
+      });
+      res.send(removeFromCart);
+    });
+    //Adding the orders
+    app.post("/addToOrders", async (req, res) => {
+      const orders = req.body;
+      const selectedProperties = orders.filteredProductsByEmail.map((order) => {
+        delete order._id;
+        return order;
+      });
+      console.log(selectedProperties);
+      const addedOrders = await orderCollection.insertMany(selectedProperties);
+      res.send(addedOrders);
+    });
+    //Displaying the orders
+    app.get("/displayOrders", async (req, res) => {
+      const orders = await orderCollection.find().toArray();
+      res.send(orders);
     });
   } finally {
   }
